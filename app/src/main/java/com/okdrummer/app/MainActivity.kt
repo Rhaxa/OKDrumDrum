@@ -215,15 +215,10 @@ class MainActivity : ComponentActivity() {
                         engine.trigger(pcm, volumes[pad] ?: 1f)
                         val longPress = awaitLongPressOrCancellation(down.id)
                         if (longPress != null) {
-                            pressed.value = false
                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                             sheetPad.value = pad
-                        } else {
-                            while (awaitPointerEvent().changes.any { it.pressed }) {
-                                // finger(ies) still down; wait for full release or cancellation
-                            }
-                            pressed.value = false
                         }
+                        pressed.value = false
                     }
                 },
             contentAlignment = Alignment.Center,

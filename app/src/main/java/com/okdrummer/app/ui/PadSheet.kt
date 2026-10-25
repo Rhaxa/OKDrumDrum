@@ -92,4 +92,4 @@ fun PadSheet(
     }
 }
 
-private fun percent(v: Float) = "%.0f%%".format(java.util.Locale.US, (v.coerceIn(0f, 1f) * 100).toInt())
+private fun percent(v: Float) = "%.0f%%".format(java.util.Locale.US, v.coerceIn(0f, 1f) * 100)

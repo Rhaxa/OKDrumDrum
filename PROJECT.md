@@ -67,16 +67,17 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 
 ## 5. Roadmap
 
-### Phase 1 — Scaffold ◐
+### Phase 1 — Scaffold ☑
 - ☑ Git init; Gradle + Compose skeleton; landscape lock; minSdk 26
-- ☑ Empty 8-pad grid renders in landscape (implemented; assembleDebug + lintDebug pass, 0 lint errors)
-- ⏳ Acceptance pending: app launches landscape, 8 labeled rectangles visible — needs a device (no AVD exists; no phone connected)
+- ☑ Empty 8-pad grid renders in landscape (assembleDebug + lintDebug pass, 0 lint errors)
+- ☑ Acceptance verified on user's phone (2026-10-25): landscape locked, 8 labeled pads correct
 - Note: default system icon + `Theme.Material.NoActionBar` for now; real icon is Phase 6 polish.
 
-### Phase 2 — Audio engine core ☐
-- [ ] Native rate/buffer detection; fast-path AudioTrack; mixer thread + trigger API
-- [ ] Latency logging hook
-- ✅ Accept: debug trigger plays a tone within contract latency on device; log line asserts ≤ 33 ms
+### Phase 2 — Audio engine core ◐
+- ☑ Native rate/buffer detection; fast-path AudioTrack; mixer thread + trigger API
+- ☑ Latency logging hook (per-trigger: app-segment + output-lag estimate → logcat + on-screen debug line)
+- ☑ TEMPORARY debug tone wired to pad touch-down (removed in Phase 3) — device readability of latency without adb
+- ⏳ Acceptance pending: tap plays tone within ≤ 33 ms on user's phone; latency values reported from device
 
 ### Phase 3 — Default sounds ☐
 - [ ] Synthesis script → 8 WAVs in assets; startup load + resample; pads wired to engine

@@ -98,7 +98,8 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ `AudioRecord` capture flow (runtime permission incl. `checkSelfPermission` guard, 10 s cap, progress bar, instant trigger once saved)
 - ☑ Revert deletes custom WAV; per-pad volume persisted; custom badge dot on pad
 - ☑ First-launch advisory dialog ("don't show again")
-- ⏳ Acceptance pending: record on a pad → tap plays the recording; revert restores; volume per pad persists across restarts
+- ☑ Phone-QA fix round (2026-10-25): %f/Int format crash on sheet open; haptic via direct Vibrator (performHapticFeedback is silenced by system touch-feedback setting); leading-silence trim on recordings (head dead-air made triggers feel late); sheet replaced by full-screen panel (bottom sheet hid controls)
+- ⏳ Acceptance pending: record on a pad → tap plays the recording in time; revert restores; volume per pad persists across restarts; haptic felt on hold
 
 ### Phase 4 — Touch layer ☐
 - [ ] Custom per-pad pointer handling (touch-down trigger, multitouch, no cross-pad blocking)

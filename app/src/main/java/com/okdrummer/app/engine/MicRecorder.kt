@@ -72,7 +72,7 @@ class MicRecorder(
         }
         record.stop()
         record.release()
-        onComplete?.invoke(if (cancelled || frames == 0) null else join(chunks, frames))
+        onComplete?.invoke(if (cancelled || frames == 0) null else trimLeadSilence(join(chunks, frames), sampleRate))
         thread = null
     }
 
@@ -84,5 +84,29 @@ class MicRecorder(
             pos += chunk.size
         }
         return out
+    }
+
+    private companion object {
+        /** Removes dead air from the head (mic buffers take ~100+ ms to spin up), so a
+         *  recorded hit triggers in sync with the default sounds. */
+        fun trimLeadSilence(pcm: ShortArray, sampleRate: Int): ShortArray {
+            var peak = 0
+            for (s in pcm) {
+                val a = absOf(s)
+                if (a > peak) peak = a
+            }
+            val threshold = maxOf(900, peak / 20)
+            var start = 0
+            while (start < pcm.size && absOf(pcm[start]) < threshold) start++
+            start = (start - sampleRate * PREROLL_MS / 1000).coerceAtLeast(0)
+            return if (start == 0) pcm else pcm.copyOfRange(start, pcm.size)
+        }
+
+        private fun absOf(s: Short): Int {
+            val v = s.toInt()
+            return if (v < 0) -v else v
+        }
+
+        const val PREROLL_MS = 5
     }
 }

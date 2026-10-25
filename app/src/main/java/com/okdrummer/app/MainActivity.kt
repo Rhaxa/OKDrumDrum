@@ -1,7 +1,12 @@
 package com.okdrummer.app
 
 import android.Manifest
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -34,9 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.okdrummer.app.assets.CustomStore
@@ -120,6 +123,7 @@ class MainActivity : ComponentActivity() {
             }
             AdviceDialog()
             sheetPad.value?.let { pad ->
+                // Full-screen panel; covers the grid entirely, so pads can't be hit underneath.
                 PadSheet(
                     pad = pad,
                     isRecording = recordingPad.value != null,
@@ -201,7 +205,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun PadCell(pad: Pad, pcm: ShortArray, hasCustom: Boolean, modifier: Modifier) {
         val pressed = remember { mutableStateOf(false) }
-        val haptics = LocalHapticFeedback.current
         Box(
             modifier
                 .fillMaxHeight()
@@ -215,7 +218,7 @@ class MainActivity : ComponentActivity() {
                         engine.trigger(pcm, volumes[pad] ?: 1f)
                         val longPress = awaitLongPressOrCancellation(down.id)
                         if (longPress != null) {
-                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            tick()
                             sheetPad.value = pad
                         }
                         pressed.value = false
@@ -238,6 +241,19 @@ class MainActivity : ComponentActivity() {
     }
 
     // ---- Sheet actions (main thread) ----
+
+    /** Short haptic tick via direct Vibrator — bypasses the system touch-feedback setting. */
+    private fun tick() {
+        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            (getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager).defaultVibrator
+        } else {
+            @Suppress("DEPRECATION")
+            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        }
+        if (vibrator.hasVibrator()) {
+            vibrator.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+        }
+    }
 
     private fun setVolume(pad: Pad, value: Float, commit: Boolean) {
         val clamped = value.coerceIn(0f, 1f)

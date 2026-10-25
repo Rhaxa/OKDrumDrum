@@ -93,13 +93,19 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ Pressed visual flash (lighter surface + accent edge) per pad, recomposed per-pad only
 - ☑ Acceptance verified on user's phone (2026-10-25): rolls OK, flash immediate, slide-across behavior accepted per §1 note
 
-### Phase 5 — Long-press sheet ◐
+### Phase 5 — Long-press sheet ☑
 - ☑ Long-press + haptic + bottom sheet on pad: Record new / Volume / Revert-if-custom
 - ☑ `AudioRecord` capture flow (runtime permission incl. `checkSelfPermission` guard, 10 s cap, progress bar, instant trigger once saved)
 - ☑ Revert deletes custom WAV; per-pad volume persisted; custom badge dot on pad
 - ☑ First-launch advisory dialog ("don't show again")
 - ☑ Phone-QA fix round (2026-10-25): %f/Int format crash on sheet open; haptic via direct Vibrator (performHapticFeedback is silenced by system touch-feedback setting); leading-silence trim on recordings (head dead-air made triggers feel late); sheet replaced by full-screen panel (bottom sheet hid controls)
-- ⏳ Acceptance pending: record on a pad → tap plays the recording in time; revert restores; volume per pad persists across restarts; haptic felt on hold
+- ☑ Acceptance verified on user's phone (2026-10-25, 0.5.2): record → tap plays in time; revert restores; volume persists; haptic felt; crash-free logcat
+
+### Phase 6 — Polish & verify ◐
+- ☐ Remove on-screen latency line (§2 verification now via logcat only) — per user decision "keep till Phase 5"
+- ☐ Proper launcher icon (adaptive, drum-pad motif)
+- ☐ Version 0.6.0; final close-out checklist: lint 0 errors, no TODO/dead code, docs final pass
+- ⏳ Acceptance pending: final visual/UX pass on user's phone; §2/§3 rules hold; latency ~47 ms accepted & documented
 
 ### Phase 4 — Touch layer ☐
 - [ ] Custom per-pad pointer handling (touch-down trigger, multitouch, no cross-pad blocking)

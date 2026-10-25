@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 8 pads (2 rows × 4), one accented — the OKDrummer grid -->
+    <path
+        android:fillColor="#7EA6FF"
+        android:pathData="M27,33 L33,33 A3,3 0 0 1 36,36 L36,44 A3,3 0 0 1 33,47 L27,47 A3,3 0 0 1 24,44 L24,36 A3,3 0 0 1 27,33 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M43,33 L49,33 A3,3 0 0 1 52,36 L52,44 A3,3 0 0 1 49,47 L43,47 A3,3 0 0 1 40,44 L40,36 A3,3 0 0 1 43,33 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M59,33 L65,33 A3,3 0 0 1 68,36 L68,44 A3,3 0 0 1 65,47 L59,47 A3,3 0 0 1 56,44 L56,36 A3,3 0 0 1 59,33 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M75,33 L81,33 A3,3 0 0 1 84,36 L84,44 A3,3 0 0 1 81,47 L75,47 A3,3 0 0 1 72,44 L72,36 A3,3 0 0 1 75,33 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M27,57 L33,57 A3,3 0 0 1 36,60 L36,68 A3,3 0 0 1 33,71 L27,71 A3,3 0 0 1 24,68 L24,60 A3,3 0 0 1 27,57 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M43,57 L49,57 A3,3 0 0 1 52,60 L52,68 A3,3 0 0 1 49,71 L43,71 A3,3 0 0 1 40,68 L40,60 A3,3 0 0 1 43,57 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M59,57 L65,57 A3,3 0 0 1 68,60 L68,68 A3,3 0 0 1 65,71 L59,71 A3,3 0 0 1 56,68 L56,60 A3,3 0 0 1 59,57 Z" />
+    <path
+        android:fillColor="#39414E"
+        android:pathData="M75,57 L81,57 A3,3 0 0 1 84,60 L84,68 A3,3 0 0 1 81,71 L75,71 A3,3 0 0 1 72,68 L72,60 A3,3 0 0 1 75,57 Z" />
+</vector>

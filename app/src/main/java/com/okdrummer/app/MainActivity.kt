@@ -30,7 +30,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,8 +65,6 @@ class MainActivity : ComponentActivity() {
     private val recordProgress = mutableStateOf(0f)
     private val permissionDenied = mutableStateOf(false)
     private val showAdvice = mutableStateOf(false)
-    private val latency = mutableStateOf<DrumEngine.LatencyStat?>(null)
-    private val overCount = mutableIntStateOf(0)
 
     private var recorder: MicRecorder? = null
 
@@ -93,8 +90,6 @@ class MainActivity : ComponentActivity() {
         showAdvice.value = !settings.adviceSeen()
 
         engine.onLatency = { stat ->
-            latency.value = stat
-            if (stat.totalMs > LATENCY_LIMIT_MS) overCount.intValue++
             Log.i(
                 TAG,
                 String.format(
@@ -115,12 +110,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun Shell() {
         MaterialTheme {
-            Column(Modifier.fillMaxSize()) {
-                Column(Modifier.weight(1f)) {
-                    PadGrid()
-                }
-                LatencyLine()
-            }
+            PadGrid()
             AdviceDialog()
             sheetPad.value?.let { pad ->
                 // Full-screen panel; covers the grid entirely, so pads can't be hit underneath.
@@ -166,25 +156,6 @@ class MainActivity : ComponentActivity() {
                     Text("Don't show again")
                 }
             },
-        )
-    }
-
-    @Composable
-    private fun LatencyLine() {
-        val stat = latency.value
-        val summary = if (stat == null) "Latency: tap any pad" else String.format(
-            Locale.US, "Latency: %.1f ms (app %.1f + output %.1f)  >33ms: %d",
-            stat.totalMs, stat.appMs, stat.outputMs, overCount.intValue
-        )
-        val good = stat == null || stat.totalMs <= LATENCY_LIMIT_MS
-        Text(
-            summary,
-            Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF14161A))
-                .padding(8.dp),
-            color = if (good) Color(0xFF9BE49B) else Color(0xFFFF6B6B),
-            fontSize = 14.sp,
         )
     }
 
@@ -300,7 +271,6 @@ class MainActivity : ComponentActivity() {
 
     private companion object {
         const val TAG = "OKDrummer"
-        const val LATENCY_LIMIT_MS = 33f
         const val COLUMNS = 4
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -97,29 +98,36 @@ class MainActivity : ComponentActivity() {
         Column(Modifier.fillMaxSize()) {
             Pad.entries.chunked(COLUMNS).forEach { rowPads ->
                 Row(Modifier.fillMaxWidth().weight(1f)) {
-                    rowPads.forEach { pad ->
-                        val pcm = samples.getValue(pad)
-                        Box(
-                            Modifier
-                                .weight(1f)
-                                .fillMaxHeight()
-                                .padding(2.dp)
-                                .background(PadColors.surface)
-                                .border(2.dp, PadColors.edge)
-                                // Interim tap handling; replaced by the real touch layer in Phase 4.
-                                .pointerInput(pcm) {
-                                    awaitEachGesture {
-                                        awaitFirstDown()
-                                        engine.trigger(pcm)
-                                    }
-                                },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(pad.label, color = PadColors.text, fontSize = 18.sp)
-                        }
-                    }
+                    rowPads.forEach { pad -> PadCell(pad, samples.getValue(pad), Modifier.weight(1f)) }
                 }
             }
+        }
+    }
+
+    /** Owns one pad's full press lifecycle: trigger + stack on touch-down, released on all-ups. */
+    @Composable
+    private fun PadCell(pad: Pad, pcm: ShortArray, modifier: Modifier) {
+        val pressed = remember { mutableStateOf(false) }
+        Box(
+            modifier
+                .fillMaxHeight()
+                .padding(2.dp)
+                .background(if (pressed.value) PadColors.pressedSurface else PadColors.surface)
+                .border(2.dp, if (pressed.value) PadColors.pressedEdge else PadColors.edge)
+                .pointerInput(pcm) {
+                    awaitEachGesture {
+                        awaitFirstDown()
+                        pressed.value = true
+                        engine.trigger(pcm)
+                        while (awaitPointerEvent().changes.any { it.pressed }) {
+                            // finger(ies) still down; wait for full release or cancellation
+                        }
+                        pressed.value = false
+                    }
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(pad.label, color = if (pressed.value) PadColors.pressedText else PadColors.text, fontSize = 18.sp)
         }
     }
 
@@ -134,4 +142,7 @@ private object PadColors {
     val surface = Color(0xFF23262C)
     val edge = Color(0xFF3A3E47)
     val text = Color(0xFFD7DAE0)
+    val pressedSurface = Color(0xFF39414E)
+    val pressedEdge = Color(0xFF7EA6FF)
+    val pressedText = Color(0xFFF2F4F8)
 }

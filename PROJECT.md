@@ -80,11 +80,17 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ TEMPORARY debug tone wired to pad touch-down (removed in Phase 3) — device readability of latency without adb
 - ⚠️ Result (2026-10-25, user's phone): ~47 ms steady state; user accepts as playable; latency revisit deferred to after Phase 4 (see §2 latency status)
 
-### Phase 3 — Default sounds ◐
+### Phase 3 — Default sounds ☑
 - ☑ Synthesis script `tools/make_sounds.py` → 8 WAVs per rate variant in assets (48 kHz + 44.1 kHz)
 - ☑ `Pad` enum + `SampleBank` loader (synchronous on main, mixer thread never touches disk)
 - ☑ Pads wired to their samples; debug tone removed
-- ⏳ Acceptance pending: all 8 pads play their correct, distinct default sound on user's phone
+- ☑ Acceptance verified on user's phone (2026-10-25): correct, distinct sounds; multitouch rolls OK
+
+### Phase 4 — Touch layer ◐
+- ☐ Per-pad pointer handling owns full press lifecycle: trigger + visual state on touch-down, release/cancel tracked to all-ups
+- ☐ Pressed visual flash (lighter surface + accent edge) per pad, recomposed per-pad only
+- ⏳ Acceptance pending: finger-drum rolls across pads never drop or mis-route hits; flash feels right
+- ⏳ Post-phase: latency tuning decision (§2) — deferred by user until after this phase
 
 ### Phase 4 — Touch layer ☐
 - [ ] Custom per-pad pointer handling (touch-down trigger, multitouch, no cross-pad blocking)

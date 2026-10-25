@@ -23,6 +23,8 @@ Pads (left→right, top row first):
 ### Behaviors
 - **Tap** (touch-down, not lift): pad plays instantly; pad visibly flashes.
 - **Multitouch**: any number of pads simultaneously; fingers on different pads never block each other.
+- **Hold-while-sliding nuance (user-decided, 2026-10-25)**: a finger held on pad A and dragged over pad B does NOT trigger B — holding is reserved for the options sheet, and crossing pads stay silent. Accepted, not a bug.
+- **Custom badge**: a small dot on a pad indicates a custom sound is loaded.
 - **Long-press** (~300 ms): haptic tick → bottom sheet on that pad with three actions:
   1. **Record new sound** (max 10 s, mic PCM, live-instant trigger once recorded)
   2. **Revert to default** (only shown if a custom sound exists; deletes the custom WAV)
@@ -47,7 +49,7 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - **UI**: Jetpack Compose, landscape-locked activity, minSdk 26, no third-party app libs.
 - **Toolchain** (fixed): Gradle 8.9 wrapper · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · compile/target SDK 34 (an android-34 platform is present locally, so builds never fetch SDK components). CLI builds must set `JAVA_HOME` to the JBR 17 runtime (`/Users/aaghilone/Library/Java/JavaVirtualMachines/jbr-17.0.14/Contents/Home`) — system Java 26 is too new and fails; Android Studio handles this automatically.
 - **Latency expectations honesty**: BT ≈ +100–200 ms unavoidable; some battery-saver modes drop the fast mixer path; latency target is best-effort per device, logged and reported.
-- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured via the on-screen hook; user accepts it as playable; tuning (buffer shaving, stereo check, …) scheduled for review after Phase 4.
+- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured via the on-screen hook; user accepts as playable for now ("may come back down the line" — no scheduled tuning).
 
 ## 3. Negative acceptance (must NOT)
 
@@ -86,11 +88,17 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ Pads wired to their samples; debug tone removed
 - ☑ Acceptance verified on user's phone (2026-10-25): correct, distinct sounds; multitouch rolls OK
 
-### Phase 4 — Touch layer ◐
-- ☐ Per-pad pointer handling owns full press lifecycle: trigger + visual state on touch-down, release/cancel tracked to all-ups
-- ☐ Pressed visual flash (lighter surface + accent edge) per pad, recomposed per-pad only
-- ⏳ Acceptance pending: finger-drum rolls across pads never drop or mis-route hits; flash feels right
-- ⏳ Post-phase: latency tuning decision (§2) — deferred by user until after this phase
+### Phase 4 — Touch layer ☑
+- ☑ Per-pad pointer handling owns full press lifecycle: trigger + visual state on touch-down, release/cancel tracked to all-ups
+- ☑ Pressed visual flash (lighter surface + accent edge) per pad, recomposed per-pad only
+- ☑ Acceptance verified on user's phone (2026-10-25): rolls OK, flash immediate, slide-across behavior accepted per §1 note
+
+### Phase 5 — Long-press sheet ◐
+- ☑ Long-press + haptic + bottom sheet on pad: Record new / Volume / Revert-if-custom
+- ☑ `AudioRecord` capture flow (runtime permission incl. `checkSelfPermission` guard, 10 s cap, progress bar, instant trigger once saved)
+- ☑ Revert deletes custom WAV; per-pad volume persisted; custom badge dot on pad
+- ☑ First-launch advisory dialog ("don't show again")
+- ⏳ Acceptance pending: record on a pad → tap plays the recording; revert restores; volume per pad persists across restarts
 
 ### Phase 4 — Touch layer ☐
 - [ ] Custom per-pad pointer handling (touch-down trigger, multitouch, no cross-pad blocking)

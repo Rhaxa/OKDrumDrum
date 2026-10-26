@@ -1,3 +1,0 @@
-/Users/aaghilone/Projects/OKDrumDrum/app/.cxx/Debug/73414y1y/arm64-v8a/CMakeFiles/drum_engine.dir
-/Users/aaghilone/Projects/OKDrumDrum/app/.cxx/Debug/73414y1y/arm64-v8a/CMakeFiles/edit_cache.dir
-/Users/aaghilone/Projects/OKDrumDrum/app/.cxx/Debug/73414y1y/arm64-v8a/CMakeFiles/rebuild_cache.dir

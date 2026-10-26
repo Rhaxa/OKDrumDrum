@@ -1,9 +1,0 @@
-# ninja log v5
-0	7746	1793004370496709611	CMakeFiles/drum_engine.dir/drum_jni.cpp.o	da1e71efd0621f64
-7753	7923	1793004370713240092	/Users/aaghilone/Projects/OKDrumDrum/app/build/intermediates/cxx/Debug/3w5j3t6g/obj/arm64-v8a/libdrum_engine.so	83172575d66ac0c0
-16	6626	1793004447573096641	CMakeFiles/drum_engine.dir/drum_jni.cpp.o	da1e71efd0621f64
-6626	6990	1793004447956559835	/Users/aaghilone/Projects/OKDrumDrum/app/build/intermediates/cxx/Debug/3w5j3t6g/obj/arm64-v8a/libdrum_engine.so	83172575d66ac0c0
-11	2081	1793004763338019156	CMakeFiles/drum_engine.dir/drum_jni.cpp.o	da1e71efd0621f64
-2082	2369	1793004763637793762	/Users/aaghilone/Projects/OKDrumDrum/app/build/intermediates/cxx/Debug/3w5j3t6g/obj/arm64-v8a/libdrum_engine.so	83172575d66ac0c0
-7	1781	1793005204147164281	CMakeFiles/drum_engine.dir/drum_jni.cpp.o	da1e71efd0621f64
-1782	2030	1793005204407662907	/Users/aaghilone/Projects/OKDrumDrum/app/build/intermediates/cxx/Debug/3w5j3t6g/obj/arm64-v8a/libdrum_engine.so	83172575d66ac0c0

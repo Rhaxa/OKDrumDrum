@@ -1,0 +1,22 @@
+# Changelog
+
+All notable changes to OKDrumDrum are documented here. Update this file every time a major feature is finished.
+
+## [1.0.0] — 2026-10-25
+
+First public release: https://github.com/Rhaxa/OKDrumDrum
+
+### Added
+- 2×4 landscape drumpad grid (low/mid/high tom, cymbal / kick, snare, closed hat, open hat) with touch-down triggering, full multitouch, and pad flash.
+- Low-latency audio engine: always-on pull-mixer thread on a fast-path `AudioTrack` (native sample rate/buffer, `PERFORMANCE_MODE_LOW_LATENCY`, USAGE_MEDIA + CONTENT_TYPE_SONIFICATION), never requesting audio focus.
+- Per-pad panel on long-press (~300 ms, haptic tick): record a custom sound (mic, 10 s max, lead-silence trim), volume slider (0–100 %, persisted), revert to default.
+- Custom sounds persisted as WAV in app storage; per-pad volumes persisted in SharedPreferences; first-launch latency advisory ("don't show again").
+- Dual-rate baked default sounds (48 kHz + 44.1 kHz via `tools/make_sounds.py`) with nearest-rate asset loading — no runtime resampling.
+- Latency logging hook (logcat) and adaptive launcher icon.
+
+### Fixed
+- Crash on opening the panel (`%f` vs Int format) · stuck pressed-state flash · missing haptic on phones where system touch feedback is off · recordings feeling late due to head dead-air.
+
+### Notes
+- Measured trigger latency on the reference device: ~47 ms (target ≤ 33 ms — accepted for v1; reduction is planned next).
+- MIT License, copyright 2026 Rhaxa.

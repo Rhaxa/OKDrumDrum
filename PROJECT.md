@@ -2,7 +2,7 @@
 
 Single doc for spec, decisions, and roadmap. Keep it terse; update it **before** implementing any change.
 Status symbols: ☐ todo · ◐ in progress · ☑ done
-**Project status: v1.0.0 released 2026-10-25** (all six phases ☑).
+**Project status: v1.0.0 released 2026-10-25** (Phases 1–6 ☑). Current work: **Phase 7 — latency reduction** (~20 ms over the ≤ 33 ms target); Phase 8 (banks A–D + pad UI) is BLOCKED on the user's interface mockup. Major-feature log lives in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## 1. Product spec
 
@@ -50,7 +50,7 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - **UI**: Jetpack Compose, landscape-locked activity, minSdk 26, no third-party app libs.
 - **Toolchain** (fixed): Gradle 8.9 wrapper · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · compile/target SDK 34 (an android-34 platform is present locally, so builds never fetch SDK components). CLI builds must set `JAVA_HOME` to the JBR 17 runtime (`/Users/aaghilone/Library/Java/JavaVirtualMachines/jbr-17.0.14/Contents/Home`) — system Java 26 is too new and fails; Android Studio handles this automatically.
 - **Latency expectations honesty**: BT ≈ +100–200 ms unavoidable; some battery-saver modes drop the fast mixer path; latency target is best-effort per device, logged and reported.
-- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured via the on-screen hook; user accepts as playable for now ("may come back down the line" — no scheduled tuning).
+- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured at v1.0.0. Revised 2026-10-26: user committed to **removing the constant ~20 ms overrun** as the next milestone (Phase 7); replacing the engine with AAudio/Oboe is explicitly in scope if the AudioTrack fast path can't reach it.
 
 ## 3. Negative acceptance (must NOT)
 
@@ -65,6 +65,7 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 ## 4. Process & code conventions
 
 - Docs before diff: every feature/behavior change enters this file first.
+- Update `CHANGELOG.md` whenever a major feature is finished.
 - Delete rather than comment out; git history remembers.
 - Phase close-out checklist: Gradle Android Lint passes (0 errors) · no TODO/FIXME · no unused code · this file updated.
 - Review loop: agent self-reviews diffs against §3 before calling a task done.
@@ -106,22 +107,19 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ Remove on-screen latency line (§2 verification now via logcat only) — per user decision "keep till Phase 5"
 - ☑ Proper launcher icon (adaptive, drum-pad motif)
 - ☑ Version 1.0.0 + final close-out checklist: build ✓ lint 0 errors ✓ no TODO/dead code ✓ docs final pass ✓
-- ☑ Acceptance verified on user's phone (2026-10-25, 0.6.0): clean fullscreen grid, full flow OK, icon fine
-- Status: **v1.0.0**
+- ☑ Acceptance verified on user's phone (2026-10-25): clean fullscreen grid, full flow OK, icon fine
+- Status: **v1.0.0** (published at github.com/Rhaxa/OKDrumDrum, tag `v1.0.0`)
 
-### Phase 4 — Touch layer ☐
-- [ ] Custom per-pad pointer handling (touch-down trigger, multitouch, no cross-pad blocking)
-- [ ] Pressed visual flash
-- ✅ Accept: finger-drum rolls across pads never drop or mis-route hits
+### Phase 7 — Latency reduction ◐
+- Goal: close the constant ~20 ms gap — steady state is ~47 ms vs the ≤ 33 ms contract (§2).
+- ☐ Re-measure baseline & split (appMs vs outputMs) on the reference device via logcat hook; identify where the ms sit (buffer depth ×2, primed silence, chunk granularity, output chain).
+- ☐ Decide path: tuned AudioTrack (buffer shaving) vs AAudio/Oboe replacement — user is open to Oboe; that amends the "no NDK" rule, so the amendment lands in §1/§2 first (docs-before-diff).
+- ☐ Implement + verify: steady state ≤ 33 ms target on speaker/wired headphones, battery-saver off.
+- ✅ Accept: measured steady state consistently ≤ 33 ms (or documented hard floor with user sign-off).
 
-### Phase 5 — Long-press sheet ☐
-- [ ] Long-press detection + haptic + bottom sheet (Record / Volume / Revert-if-custom)
-- [ ] `AudioRecord` capture flow + permission + persistence + instant triggering
-- [ ] Revert deletes custom WAV; volume slider persisted and working on defaults & customs
-- [ ] First-launch advisory dialog ("don't show again")
-- ✅ Accept: record on pad → tap plays recording; revert restores; volume per pad persists
-
-### Phase 6 — Polish & verify ☐
-- [ ] Close-out checklist; latency report from real device; edge cases (BT/battery-saver messaging)
-- ✅ Accept: all §2/§3 rules hold on device; PROJECT.md final status pass
+### Phase 8 — Sound banks A–D + pad UI refresh ◐
+- Banks A/B/C/D: user swaps ALL 8 sounds of the current bank to another set in one action; each bank has a signature color that changes the pads' outline (Bank A = current blue).
+- Includes a pad visual redesign — **BLOCKED on the user-provided interface mockup**; do not start without it (user decision 2026-10-26: "without this mockup, 2/ and 3/ cannot be started, making latency reduction the true most valuable next step").
+- ☐ (after mockup) Spec the bank storage model + UI per mockup in §1 before coding.
+- ✅ Accept: bank switching changes pad outline color + all 8 sounds atomically, sounds persist per bank across restarts.
 </content>

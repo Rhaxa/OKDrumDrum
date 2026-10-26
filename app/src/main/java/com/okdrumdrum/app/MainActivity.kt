@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         engine.start(this)
-        Log.i(TAG, "native sampleRate=${engine.sampleRate} framesPerBuffer=${engine.framesPerBuffer}")
+        Log.i(TAG, "native sampleRate=${engine.sampleRate} framesPerCallback=${engine.framesPerCallback}")
 
         settings = PadSettings(this)
         customStore = CustomStore(this)

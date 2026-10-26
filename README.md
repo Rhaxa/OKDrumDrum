@@ -21,9 +21,9 @@ Open in **Android Studio** and run, or use the wrapper:
 JAVA_HOME="<path-to-a-JDK-17>" ./gradlew :app:assembleDebug
 ```
 
-Requires JDK 17 (system Java 26 is too new for the pinned Gradle 8.9). minSdk 26.
+Requires JDK 17 (system Java 26 is too new for the pinned Gradle 8.9). minSdk 29 (Android 10+).
 
-A prebuilt debug APK ships in this repository: **`dist/OKDrumDrum-1.0.1-debug.apk`** (sideload at your own risk; unsigned for release, debug-signed).
+A prebuilt debug APK ships in this repository: **`dist/OKDrumDrum-1.1.0-debug.apk`** (sideload at your own risk; unsigned for release, debug-signed).
 
 ## License
 

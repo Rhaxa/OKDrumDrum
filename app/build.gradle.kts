@@ -8,12 +8,22 @@ android {
     namespace = "com.okdrumdrum.app"
     compileSdk = 34
 
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.okdrumdrum.app"
-        minSdk = 26
+        minSdk = 29
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.0.1"
+        versionCode = 5
+        versionName = "1.1.0"
+        ndk {
+            abiFilters.add("arm64-v8a")
+        }
     }
 
     compileOptions {

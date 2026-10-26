@@ -18,7 +18,7 @@ A low-latency landscape Android drumpad, pure Kotlin + Compose, no third-party a
 
 ### v1.x roadmap (user-decided 2026-10-26)
 
-1. **Latency reduction** (NEXT, unblocked) — shave the constant ~20 ms overrun. AAudio/Oboe are *candidates* for the replacement, not commitments: the target path (tuned AudioTrack vs engine swap) is decided during Phase 7 from real measurements (user, 2026-10-26).
+1. **Latency reduction** (Phase 7, nearly closed): the AAudio/C++ callback engine (raw AAudio via JNI, app/src/main/cpp) is at PLATFORM PARITY with reference drum apps on the user's OPPO — flinger reports an identical 52.67 ms track latency for our app and the best-known reference drum app (fast output AudioOut_1D, HAL 256, dirac inactive). App-side ≈2 ms. The loudspeaker constant is vendor HAL/DSP, not beatable per-app. User A/B feel verdict received: parity confirmed by ear (2026-10-26).
 2. **Sound banks A–B–C–D** — user swaps ALL 8 sounds of a bank to another set; each bank has a color that changes the pads' outline; Bank A = current blue. **BLOCKED**: waiting for the user to provide an interface mockup.
 3. **UI refresh of the pads** (with banks) — same **BLOCKED on the mockup**.
 
@@ -27,14 +27,20 @@ A low-latency landscape Android drumpad, pure Kotlin + Compose, no third-party a
 Package/identity is `com.okdrumdrum.app` (renamed from `com.okdrummer.app` in v1.0.1, 2026-10-26; old-ID installs are uninstalled manually and their data does not migrate). Log tag is `OKDrumDrum`.
 
 ```
-app/src/main/java/com/okdrummer/app/
+app/src/main/java/com/okdrumdrum/app/
 ├── Pad.kt                 enum: LOW_TOM…HAT_OPEN (label + asset name)
 ├── MainActivity.kt        shell + PadCell (press lifecycle), state wiring, recorder flow,
 │                          Vibrator tick(), PadColors (pad palette lives HERE)
-├── engine/                ← the ONLY place AudioTrack/AudioRecord are touched; zero UI imports
-│   ├── DrumEngine.kt      AudioTrack fast-path pull mixer (details below)
+├── engine/                audio layer; zero UI imports
+│   ├── DrumEngine.kt      thin Kotlin API: start/trigger/stop/onLatency; JNI bridge
 │   └── MicRecorder.kt     AudioRecord capture: mono 16-bit @ native rate, 10 s cap,
-│                          lead-silence trim (threshold max(900, peak/20) + 5 ms preroll)
+│                          lead-silence + trailing stop-tap trim (threshold max(900,peak/20) ± 5 ms pad)
+├── cpp/ (app/src/main/cpp/)
+│   ├── drum_jni.cpp       AAudio low-latency STREAM (MMAP EXCLUSIVE denied by OPPO policy,
+│   │                      falls back to SHARED), stereo int16, USAGE_GAME (exp.3 parity),
+│   │                      data callback mixes voices (same math as old Kotlin mixer),
+│   │                      512-frame ring (2 bursts), latency report via JNI onNativeLatency
+│   └── CMakeLists.txt     libdrum_engine (aaudio android log)
 ├── assets/
 │   ├── SampleBank.kt      loads dual-rate baked WAVs (assets/sounds/{48000,44100}/<asset>.wav),
 │   │                      picks nearest to device native rate; NO runtime resampler
@@ -45,15 +51,16 @@ app/src/main/java/com/okdrummer/app/
 tools/make_sounds.py       synthesizes the 8 default one-shots at both rates
 ```
 
-### DrumEngine details (relevant to latency work)
+Legacy pull-mixer (AudioTrack) was REPLACED by the AAudio callback engine in Phase 7 (no dead code kept).
 
-- `AudioTrack`, MODE_STREAM, `PERFORMANCE_MODE_LOW_LATENCY`, `USAGE_MEDIA` + `CONTENT_TYPE_SONIFICATION`, mono 16-bit, native rate via `AudioManager.PROPERTY_OUTPUT_*`.
-- Buffer = `max(getMinBufferSize, framesPerBuffer*2*2)` → typically 2× the fast-path buffer. **Prime buffer filled with silence before `play()`** (this affects the measured output lag).
-- Always-on mixer thread (URGENT_AUDIO): writes one `framesPerBuffer` chunk per loop; pending voices (ConcurrentLinkedQueue of `Pair<Voice, triggerNanos>`) are absorbed at chunk boundaries; up to 16 voices mixed into an int accumulator, then clamped to shorts.
-- Latency hook `onLatency(LatencyStat(totalMs, appMs, outputMs))` fired per trigger from the mixer thread; `MainActivity` logs it via `Log.i("OKDrumDrum", "trigger total=…")` (no UI line anymore).
-- Playhead-lag calibration every 96 chunks using `AudioTrack.getTimestamp()`.
+### Engine specifics (Phase 7, current)
 
-Known latency makeup (~47 ms measured on the reference OPPO): touch-driven trigger → UI thread → mixer poll granularity (≤1 chunk, e.g. 256 frames @48 kHz = ~5.3 ms) + buffer depth (~5–10 ms) + output chain (~30 ms?) — the fix likely requires either smaller/primes buffer, per-track fast path, or AAudio low-latency stream.
+- AAudio low-latency stream: burst=256 frames (~5.3 ms), ring capacity 512 (2 bursts — default 2048 cost ~42.7 ms lag), SHARING_MODE_SHARED (OPPO denies MMAP EXCLUSIVE via its `aaudio-compatible-apps` gate — same denial reference drum apps get).
+- Mixing lives in the C++ callback (`drum_jni.cpp`): voices pooled in a mutex'd vector (max 16), mono mixed into an int accumulator, duplicated L/R in the clamp; nothing allocated on the audio thread.
+- Latency stat: "app ms" = trigger → absorbed by callback; "output ms" = playhead lag via `AAudioStream_getTimestamp(CLOCK_MONOTONIC)`, recalibrated every 96 callbacks; reported through JNI `onNativeLatency(Float, Float, Float)` → Kotlin `onLatency` → Log.i("OKDrumDrum").
+- Measured on the OPPO DN2103 loudspeaker: total ≈53–56 ms, of which our code ≈2 ms; the rest is the device's fast-output chain — the same value AudioFlinger computes for reference drum apps (dumpsys-verified).
+- USAGE_GAME (experiment 3) changed nothing; kept — equivalent parity and semantically right next to music apps (still never requests audio focus).
+
 
 ## 3. What is finished (all device-verified on the user's OPPO)
 
@@ -94,4 +101,4 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 - Device: OPPO DN2103 (`FQ4LLZUWEYXG4XLF`); adb at `$HOME/Library/Android/sdk/platform-tools/adb`; deploy = `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
 - First diagnostic after any crash: `adb logcat -d -b crash "*:E"`; latency check: `adb logcat | grep OKDrumDrum` (log tag is **OKDrumDrum** everywhere as of v1.0.1).
 - `gh` CLI is NOT usable on this machine (auth login fails; brew install hung) — publish via SSH push only (`git push -u origin main --follow-tags`).
-- Current APK (in-repo, committed): `dist/OKDrumDrum-1.0.1-debug.apk` (v1.0.1); README states the path explicitly.
+- Current APK (in-repo, committed): `dist/OKDrumDrum-1.1.0-debug.apk` (v1.1.0); README states the path explicitly.

@@ -72,7 +72,10 @@ class MicRecorder(
         }
         record.stop()
         record.release()
-        onComplete?.invoke(if (cancelled || frames == 0) null else trimLeadSilence(join(chunks, frames), sampleRate))
+        onComplete?.invoke(
+            if (cancelled || frames == 0) null
+            else trimTrailingTap(trimLeadSilence(join(chunks, frames), sampleRate), sampleRate)
+        )
         thread = null
     }
 
@@ -100,6 +103,25 @@ class MicRecorder(
             while (start < pcm.size && absOf(pcm[start]) < threshold) start++
             start = (start - sampleRate * PREROLL_MS / 1000).coerceAtLeast(0)
             return if (start == 0) pcm else pcm.copyOfRange(start, pcm.size)
+        }
+
+        /** Removes the stop-tap impulse from the tail: after the last loud sample the hit
+         *  decayed below threshold, so anything loud after it is the button tap. */
+        fun trimTrailingTap(pcm: ShortArray, sampleRate: Int): ShortArray {
+            var peak = 0
+            for (s in pcm) {
+                val a = absOf(s)
+                if (a > peak) peak = a
+            }
+            val threshold = maxOf(900, peak / 20)
+            var last = pcm.size
+            for (i in pcm.indices.reversed()) {
+                if (absOf(pcm[i]) > threshold) {
+                    last = (i + sampleRate * PREROLL_MS / 1000).coerceAtLeast(0).coerceAtMost(pcm.size)
+                    break
+                }
+            }
+            return if (last == pcm.size) pcm else pcm.copyOfRange(0, last)
         }
 
         private fun absOf(s: Short): Int {

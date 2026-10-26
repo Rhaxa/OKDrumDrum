@@ -19,8 +19,8 @@ android {
         applicationId = "com.okdrumdrum.app"
         minSdk = 29
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.1.0"
+        versionCode = 6
+        versionName = "1.2.0"
         ndk {
             abiFilters.add("arm64-v8a")
         }

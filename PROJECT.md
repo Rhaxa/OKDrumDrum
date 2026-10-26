@@ -2,7 +2,7 @@
 
 Single doc for spec, decisions, and roadmap. Keep it terse; update it **before** implementing any change.
 Status symbols: ☐ todo · ◐ in progress · ☑ done
-**Project status: v1.0.0 released 2026-10-25** (Phases 1–6 ☑). Current work: **Phase 7 — latency reduction** (~20 ms over the ≤ 33 ms target); Phase 8 (banks A–D + pad UI) is BLOCKED on the user's interface mockup. Major-feature log lives in [`CHANGELOG.md`](CHANGELOG.md).
+**Project status: v1.1.0 released** (Phases 1–7 ☑). **Phase 8 (banks A–D + user-asset pad UI) implemented and user-accepted 2026-10-26 → released as v1.2.0**. Major-feature log lives in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## 1. Product spec
 
@@ -134,12 +134,12 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - ☑ Implement + verify: AAudio callback client written in C++ (app/src/main/cpp), AudioTrack path removed; ring shrunk to 2 bursts (2048→512 frames, -42→-11 ms lag); USAGE_GAME parity round; stop-tap tail trim on recordings; minSdk raised 26→29.
 - ✅ Accept (closed 2026-10-26): steady state ≈53 ms total / ≈2 ms app-side; ≤33 ms proven unreachable on this device's loudspeaker (vendor constant, identical for the reference drum app — dumpsys evidence). User Feel-verified parity. Phase 7 ☑ with the floor documented in §2.
 
-### Phase 8 — Sound banks A–D + pad UI (design locked 2026-10-26, implementation not started) ◐
-Design is locked from the user's mockup + discussion (§1 Banks; button look constant, active bank = pad outline color only, bank-colored pressed flash & dot, ~150 ms color cross-fade, tiny pad labels, per-bank volumes, straight-tap switching on both sides, branded top bar, bank-themed record panel, subtle per-bank default renditions, migration into Bank A).
-- ☐ `tools/make_sounds.py`: 4 bank renditions (pitch/ADSR variation), 2 rates → 64 WAVs
-- ☐ `SampleBank`/`CustomStore`/`PadSettings` bank-aware (assets `sounds/<rate>/<bank>/`, customs `custom/<bank>/`, prefs keys per bank; v1→A migration)
-- ☐ Engine: load all 4 banks at start; trigger = active bank's sample; switch without touching the audio thread
-- ☐ UI: top bar (A–D left & right, center pill), pad grid restyle (rounded, bank outline, bank pressed state, bank dot, tiny label, cross-fade animation), bank-themed record panel
-- ☐ Version 1.2.0; close-out per §4 (lint 0, docs, CHANGELOG)
+### Phase 8 — Sound banks A–D + pad UI (implemented + user QA'd 2026-10-26, shipped 1.2.0) ☑
+Design is locked from the user's mockup + discussion (§1 Banks; button look constant, active bank = pad outline color only, bank-colored pressed flash & dot, ~150 ms color cross-fade, tiny pad labels, per-bank volumes, straight-tap switching on both sides, branded top bar, bank-themed record panel, subtle per-bank default renditions, migration into Bank A). Final visuals applied from the user's own SVG assets: pad face (accent plate lip + hairline stroke + dot texture, drawn in `drawBehind` and clipped to the rounded outline), bank buttons (64×64 recipe, constant look), pill (black fill, white stadium stroke) with the top bar painted to match.
+- ✅ `tools/make_sounds.py`: 4 bank renditions (pitch/ADSR variation), 2 rates → 64 WAVs
+- ✅ `SampleBank`/`CustomStore`/`PadSettings` bank-aware (assets `sounds/<rate>/<bank>/`, customs `custom/<bank>/`, prefs keys per bank; v1→A migration)
+- ✅ Engine: load all 4 banks at start; trigger = active bank's sample; switch without touching the audio thread
+- ✅ UI: top bar (A–D left & right, center pill), pad grid restyle (rounded, bank outline, bank pressed state, bank dot, tiny label, cross-fade animation), bank-themed record panel
+- ✅ Version 1.2.0; close-out per §4 (lint 0, docs, CHANGELOG)
 - ✅ Accept: switching banks changes pad outline color + all 8 sounds atomically (both sides tappable); per-bank custom + volume persist; defaults differ audibly-but-subtly between banks; migration preserves v1.1 data; no dead code.
 </content>

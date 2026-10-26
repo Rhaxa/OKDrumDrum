@@ -2,6 +2,20 @@
 
 All notable changes to OKDrumDrum are documented here. Update this file every time a major feature is finished.
 
+## [1.2.0] — 2026-10-26
+
+### Added
+- **Sound banks A–D**: four independent, complete sound sets, switchable with a straight tap on button groups on both sides of the top bar. Active bank is communicated only by the pad outline color (plus the pressed flash, custom dot, and record-panel accent) — the bank buttons keep a constant look. ~160 ms cross-fade on bank switch. Per-bank bank-specific default renditions (subtle pitch/decay tuning) baked by `tools/make_sounds.py` (64 WAVs, 8 sounds × 4 banks × 2 rates).
+- Per-(bank, pad) settings: custom recordings, volume slider values, and bank selection all persist per bank; v1.1 data is migrated into Bank A on first launch.
+- User-supplied SVG visuals implemented natively: pad face (accent lip + hairline + dot texture, painted in `drawBehind`, clipped to the rounded outline — no bitmaps), bank buttons, and the black OKDRUMDRUM pill (top bar painted to match).
+
+### Fixed
+- Volume slider in the banked UI appeared stuck at 100 % — the tracked state map only recomposes on structural writes, so slider writes now replace the inner map instead of mutating it.
+- Git hygiene: the tracked CMake build cache (`app/.cxx/`) is untracked and ignored.
+
+---
+
+
 ## [1.1.0] — 2026-10-26
 
 ### Changed

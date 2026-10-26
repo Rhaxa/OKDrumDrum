@@ -29,8 +29,10 @@ Package/identity is `com.okdrumdrum.app` (renamed from `com.okdrummer.app` in v1
 ```
 app/src/main/java/com/okdrumdrum/app/
 ├── Pad.kt                 enum: LOW_TOM…HAT_OPEN (label + asset name)
-├── MainActivity.kt        shell + PadCell (press lifecycle), state wiring, recorder flow,
-│                          Vibrator tick(), PadColors (pad palette lives HERE)
+├── Bank.kt                banks A–D (accent colors: A #1DA8E8, B #46D140, C #F7931E, D #F02FC2)
+├── MainActivity.kt        shell + TopBar (Pill/BankButtons) + PadCell (press lifecycle), state wiring,
+│                          recorder flow, Vibrator tick(); user-SVG pad/button/pill faces drawn in
+│                          drawBehind (Studio geom constants + dot-tile clip) — no bitmaps
 ├── engine/                audio layer; zero UI imports
 │   ├── DrumEngine.kt      thin Kotlin API: start/trigger/stop/onLatency; JNI bridge
 │   └── MicRecorder.kt     AudioRecord capture: mono 16-bit @ native rate, 10 s cap,
@@ -42,13 +44,15 @@ app/src/main/java/com/okdrumdrum/app/
 │   │                      512-frame ring (2 bursts), latency report via JNI onNativeLatency
 │   └── CMakeLists.txt     libdrum_engine (aaudio android log)
 ├── assets/
-│   ├── SampleBank.kt      loads dual-rate baked WAVs (assets/sounds/{48000,44100}/<asset>.wav),
-│   │                      picks nearest to device native rate; NO runtime resampler
-│   ├── CustomStore.kt     per-pad customs in filesDir/custom/<asset>.wav
+│   ├── SampleBank.kt      loads assets/sounds/<rate>/<bank>/<asset>.wav (both rates × 4 banks at
+│   │                      start), nearest rate to device native; NO runtime resampler
+│   ├── CustomStore.kt     customs in filesDir/custom/<bank>/<asset>.wav; one-time v1→Bank-A migration
 │   ├── WavCodec.kt        16-bit mono WAV read/write
-│   └── PadSettings.kt     SharedPreferences "okdrummer": vol_<PAD>, advice_seen
-└── ui/PadSheet.kt         full-screen panel: Record new / Revert-if-custom / Volume slider
-tools/make_sounds.py       synthesizes the 8 default one-shots at both rates
+│   └── PadSettings.kt     SharedPreferences "okdrummer": vol_<bank>_<PAD>, active_bank, advice_seen;
+│                          one-time v1 vol_<PAD> → vol_A_<PAD> migration
+└── ui/PadSheet.kt         full-screen panel, accent-parameterized: Record new / Revert-if-custom /
+│                          Volume slider (banked)
+tools/make_sounds.py       synthesizes 8 × 4 bank renditions at both rates (BANKS pitch/decay dict)
 ```
 
 Legacy pull-mixer (AudioTrack) was REPLACED by the AAudio callback engine in Phase 7 (no dead code kept).
@@ -73,8 +77,10 @@ Legacy pull-mixer (AudioTrack) was REPLACED by the AAudio callback engine in Pha
 | 4 | Touch layer: per-pad pointer handler, touch-down trigger, flash, multitouch | ☑ |
 | 5 | Hold panel: record/10 s cap/trim, volume persisted, revert, advice dialog | ☑ |
 | 6 | Polish: latency UI line removed, adaptive icon, v1.0.0 close-out | ☑ |
+| 7 | Latency: AAudio C++ callback engine (raw JNI), 512-frame ring, USAGE_GAME round, platform parity proven | ☑ |
+| 8 | Banks A–D + user-SVG pad/button/pill visuals + per-bank persistence + v1→A migration | ☑ |
 
-QA-fix history (why some code looks the way it does): `%f`/Int format crash on sheet open · `performHapticFeedback` silenced by OPPO system setting → direct `Vibrator` (VIBRATE permission) · recordings felt late → lead-silence trim · bottom sheet half-height → full-screen panel · stuck pressed flash → removed wait-loop, reset on all gesture exits.
+QA-fix history (why some code looks the way it does): `%f`/Int format crash on sheet open · `performHapticFeedback` silenced by OPPO system setting → direct `Vibrator` (VIBRATE permission) · recordings felt late → lead-silence trim · bottom sheet half-height → full-screen panel · stuck pressed flash → removed wait-loop, reset on all gesture exits · v1.2.0 slider stuck at 100 % → tracked state map needs STRUCTURAL writes (mutating an inner plain map doesn't recompose).
 
 ## 4. Immediate next steps
 

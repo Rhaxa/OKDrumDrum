@@ -9,9 +9,12 @@ All notable changes to OKDrumDrum are documented here. Update this file every ti
 - Per-(bank, pad) settings: custom recordings, volume slider values, and bank selection all persist per bank; v1.1 data is migrated into Bank A on first launch.
 - User-supplied SVG visuals implemented natively: pad face (accent lip + hairline + dot texture, painted in `drawBehind`, clipped to the rounded outline — no bitmaps), bank buttons, and the black OKDRUMDRUM pill (top bar painted to match).
 
+### Changed
+- Docs truth-up: README architecture note and PROJECT.md engine contract now describe the AAudio C++ callback engine (USAGE_GAME, JNI-reported latency) instead of the retired AudioTrack/`getMinBufferSize` pull-mixer story — no code change.
+- Git hygiene: the tracked CMake build cache (`app/.cxx/`) is untracked and ignored.
+
 ### Fixed
 - Volume slider in the banked UI appeared stuck at 100 % — the tracked state map only recomposes on structural writes, so slider writes now replace the inner map instead of mutating it.
-- Git hygiene: the tracked CMake build cache (`app/.cxx/`) is untracked and ignored.
 
 ---
 

@@ -9,7 +9,7 @@ A low-latency landscape drumpad for Android: 2 rows × 4 pads (tom, mid tom, hig
 
 ## Architecture notes
 
-Pure Kotlin + Compose on an `AudioTrack` **fast mixer path** (native sample rate, always-on pull-mixer thread) — no NDK, no third-party app libraries. Measured steady-state trigger latency on the reference device: **~47 ms** (touch → sound; Bluetooth and battery-saver excluded).
+Pure Kotlin + Compose UI with a thin C++ audio layer: raw **AAudio via JNI** (no third-party libraries) — the device's fast audio callback mixes triggered samples at the native sample rate, filling silence otherwise. Measured trigger latency on the reference device's loudspeaker: **~53 ms total**, of which ≈2 ms is app code; the rest is the vendor output path shared by every low-latency app on that device (platform-parity verified via `dumpsys`). Bluetooth and battery-saver excluded — both add to it.
 
 Full spec, decisions log, and roadmap: [`PROJECT.md`](PROJECT.md).
 

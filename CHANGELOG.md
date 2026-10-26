@@ -2,6 +2,12 @@
 
 All notable changes to OKDrumDrum are documented here. Update this file every time a major feature is finished.
 
+## [1.0.1] — 2026-10-26
+
+### Changed
+- Android package/identity renamed `com.okdrummer.app` → `com.okdrumdrum.app` (full source-tree + namespace + applicationId rename; log tags unified to `OKDrumDrum`). Existing recordings/volumes under the old ID do not migrate — the old install was kept until manually uninstalled.
+- Prebuilt debug APK now shipped in-repo: `dist/OKDrumDrum-1.0.1-debug.apk`, path documented in README.
+
 ## [1.0.0] — 2026-10-25
 
 First public release: https://github.com/Rhaxa/OKDrumDrum

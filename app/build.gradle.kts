@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "com.okdrummer.app"
+    namespace = "com.okdrumdrum.app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.okdrummer.app"
+        applicationId = "com.okdrumdrum.app"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.0.0"
+        versionCode = 4
+        versionName = "1.0.1"
     }
 
     compileOptions {

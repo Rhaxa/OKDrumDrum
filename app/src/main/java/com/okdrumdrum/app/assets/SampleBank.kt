@@ -1,8 +1,8 @@
-package com.okdrummer.app.assets
+package com.okdrumdrum.app.assets
 
 import android.content.res.AssetManager
 import android.util.Log
-import com.okdrummer.app.Pad
+import com.okdrumdrum.app.Pad
 import kotlin.math.abs
 
 /**
@@ -24,7 +24,7 @@ class SampleBank(private val assets: AssetManager) {
     private fun readAsset(path: String): ByteArray = assets.open(path).use { stream -> stream.readBytes() }
 
     private companion object {
-        const val TAG = "OKDrummer"
+        const val TAG = "OKDrumDrum"
         val ASSET_RATES = intArrayOf(48_000, 44_100)
     }
 }

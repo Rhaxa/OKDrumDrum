@@ -1,4 +1,4 @@
-package com.okdrummer.app.ui
+package com.okdrumdrum.app.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.okdrummer.app.Pad
+import com.okdrumdrum.app.Pad
 
 private object PanelColors {
     val background = Color(0xFF16181D)

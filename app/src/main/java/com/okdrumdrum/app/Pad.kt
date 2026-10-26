@@ -1,4 +1,4 @@
-package com.okdrummer.app
+package com.okdrumdrum.app
 
 /** One drumpad. Order = grid order: top row left→right, then bottom row (PROJECT.md §1). */
 enum class Pad(val label: String, val asset: String) {

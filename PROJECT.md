@@ -50,7 +50,7 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 - **UI**: Jetpack Compose, landscape-locked activity, minSdk 26, no third-party app libs.
 - **Toolchain** (fixed): Gradle 8.9 wrapper · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · compile/target SDK 34 (an android-34 platform is present locally, so builds never fetch SDK components). CLI builds must set `JAVA_HOME` to the JBR 17 runtime (`/Users/aaghilone/Library/Java/JavaVirtualMachines/jbr-17.0.14/Contents/Home`) — system Java 26 is too new and fails; Android Studio handles this automatically.
 - **Latency expectations honesty**: BT ≈ +100–200 ms unavoidable; some battery-saver modes drop the fast mixer path; latency target is best-effort per device, logged and reported.
-- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured at v1.0.0. Revised 2026-10-26: user committed to **removing the constant ~20 ms overrun** as the next milestone (Phase 7); replacing the engine with AAudio/Oboe is explicitly in scope if the AudioTrack fast path can't reach it.
+- **Latency status (2026-10-25, user's phone)**: ~47 ms steady state measured at v1.0.0. Revised 2026-10-26: user committed to **removing the constant ~20 ms overrun** as the next milestone (Phase 7). AAudio/Oboe are *candidates*, not commitments — the target path (tuned AudioTrack vs engine replacement) is decided during Phase 7 investigation.
 
 ## 3. Negative acceptance (must NOT)
 
@@ -113,7 +113,7 @@ No sequencer, no samples library browsing UI, no sharing/export, no sound packs 
 ### Phase 7 — Latency reduction ◐
 - Goal: close the constant ~20 ms gap — steady state is ~47 ms vs the ≤ 33 ms contract (§2).
 - ☐ Re-measure baseline & split (appMs vs outputMs) on the reference device via logcat hook; identify where the ms sit (buffer depth ×2, primed silence, chunk granularity, output chain).
-- ☐ Decide path: tuned AudioTrack (buffer shaving) vs AAudio/Oboe replacement — user is open to Oboe; that amends the "no NDK" rule, so the amendment lands in §1/§2 first (docs-before-diff).
+- ☐ Decide path — tuned AudioTrack (buffer shaving) vs engine replacement (e.g. AAudio/Oboe). No prior commitment: the target is chosen from the Phase 7 measurements. Choosing AAudio/Oboe amends the "no NDK" rule, so that amendment lands in §1/§2 first (docs-before-diff).
 - ☐ Implement + verify: steady state ≤ 33 ms target on speaker/wired headphones, battery-saver off.
 - ✅ Accept: measured steady state consistently ≤ 33 ms (or documented hard floor with user sign-off).
 

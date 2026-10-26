@@ -18,13 +18,13 @@ A low-latency landscape Android drumpad, pure Kotlin + Compose, no third-party a
 
 ### v1.x roadmap (user-decided 2026-10-26)
 
-1. **Latency reduction** (NEXT, unblocked) — shave the constant ~20 ms overrun. User explicitly open to replacing the `AudioTrack` engine with **AAudio/Oboe** if relevant — note this amends the current "no NDK / Kotlin only" rule, so that amendment must be written into `PROJECT.md` §1/§2 **first** (docs-before-diff).
+1. **Latency reduction** (NEXT, unblocked) — shave the constant ~20 ms overrun. AAudio/Oboe are *candidates* for the replacement, not commitments: the target path (tuned AudioTrack vs engine swap) is decided during Phase 7 from real measurements (user, 2026-10-26).
 2. **Sound banks A–B–C–D** — user swaps ALL 8 sounds of a bank to another set; each bank has a color that changes the pads' outline; Bank A = current blue. **BLOCKED**: waiting for the user to provide an interface mockup.
 3. **UI refresh of the pads** (with banks) — same **BLOCKED on the mockup**.
 
 ## 2. Current architecture
 
-Package is `com.okdrummer.app` (kept after the repository/app rename; only the Gradle project name `settings.gradle.kts` and the launcher label are "OKDrumDrum").
+Package/identity is `com.okdrumdrum.app` (renamed from `com.okdrummer.app` in v1.0.1, 2026-10-26; old-ID installs are uninstalled manually and their data does not migrate). Log tag is `OKDrumDrum`.
 
 ```
 app/src/main/java/com/okdrummer/app/
@@ -50,7 +50,7 @@ tools/make_sounds.py       synthesizes the 8 default one-shots at both rates
 - `AudioTrack`, MODE_STREAM, `PERFORMANCE_MODE_LOW_LATENCY`, `USAGE_MEDIA` + `CONTENT_TYPE_SONIFICATION`, mono 16-bit, native rate via `AudioManager.PROPERTY_OUTPUT_*`.
 - Buffer = `max(getMinBufferSize, framesPerBuffer*2*2)` → typically 2× the fast-path buffer. **Prime buffer filled with silence before `play()`** (this affects the measured output lag).
 - Always-on mixer thread (URGENT_AUDIO): writes one `framesPerBuffer` chunk per loop; pending voices (ConcurrentLinkedQueue of `Pair<Voice, triggerNanos>`) are absorbed at chunk boundaries; up to 16 voices mixed into an int accumulator, then clamped to shorts.
-- Latency hook `onLatency(LatencyStat(totalMs, appMs, outputMs))` fired per trigger from the mixer thread; `MainActivity` logs it via `Log.i("OKDrummer", "trigger total=…")` (no UI line anymore).
+- Latency hook `onLatency(LatencyStat(totalMs, appMs, outputMs))` fired per trigger from the mixer thread; `MainActivity` logs it via `Log.i("OKDrumDrum", "trigger total=…")` (no UI line anymore).
 - Playhead-lag calibration every 96 chunks using `AudioTrack.getTimestamp()`.
 
 Known latency makeup (~47 ms measured on the reference OPPO): touch-driven trigger → UI thread → mixer poll granularity (≤1 chunk, e.g. 256 frames @48 kHz = ~5.3 ms) + buffer depth (~5–10 ms) + output chain (~30 ms?) — the fix likely requires either smaller/primes buffer, per-track fast path, or AAudio low-latency stream.
@@ -71,8 +71,8 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 
 ## 4. Immediate next steps
 
-1. **Enter latency-reduction work in `PROJECT.md` §5 first** (docs-before-diff): add "Phase 7 — Latency reduction". If going AAudio/Oboe, also amend §1 "no third-party libs / Kotlin only" and §2 "Audio engine" BEFORE coding; Oboe ships as a prebuilt `.so`/AAR, which is a deliberate rule change.
-2. Investigate the ~20 ms: re-verify on device with `adb logcat | grep OKDrummer` (hook still live); compare `appMs` vs `outputMs` split; candidate levers: buffer size (currently 2× fast-path buffer), primed-silence depth, chunk granularity, then decide AudioTrack tuning vs AAudio rewrite.
+1. **Update `PROJECT.md` Phase 7 as findings land** (docs-before-diff). If measurements point to an engine replacement (e.g. AAudio/Oboe), the "no NDK / Kotlin only" rule in §1/§2 must be amended BEFORE coding (Oboe = prebuilt `.so`/AAR, a deliberate rule change).
+2. Investigate the ~20 ms: re-verify on device with `adb logcat | grep OKDrumDrum` (hook still live); compare `appMs` vs `outputMs` split; candidate levers: buffer size (currently 2× fast-path buffer), primed-silence depth, chunk granularity, then decide AudioTrack tuning vs engine rewrite (AAFaudio/Oboe = candidates only; decided during Phase 7).
 3. Acceptance for phase: steady-state ≤ 33 ms target on the reference device (user said latency sat "constantly 20 ms above target" — treat 47 ms as the baseline to beat).
 4. Do NOT start banks/mockup work — blocked until user supplies the interface mockup.
 
@@ -92,6 +92,6 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
   Command: `JAVA_HOME="<jbr-17>" ./gradlew :app:assembleDebug :app:lintDebug`
 - Pins: Gradle 8.9 · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · SDK 34 (only android-29/34 platforms installed locally) · minSdk 26 · versionCode 3 / versionName 1.0.0.
 - Device: OPPO DN2103 (`FQ4LLZUWEYXG4XLF`); adb at `$HOME/Library/Android/sdk/platform-tools/adb`; deploy = `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
-- First diagnostic after any crash: `adb logcat -d -b crash "*:E"`; latency check: `adb logcat | grep OKDrummer` (log tag remains **OKDrummer** everywhere).
+- First diagnostic after any crash: `adb logcat -d -b crash "*:E"`; latency check: `adb logcat | grep OKDrumDrum` (log tag is **OKDrumDrum** everywhere as of v1.0.1).
 - `gh` CLI is NOT usable on this machine (auth login fails; brew install hung) — publish via SSH push only (`git push -u origin main --follow-tags`).
 - APK in `dist/OKDrumDrum-1.0.0-debug.apk`.

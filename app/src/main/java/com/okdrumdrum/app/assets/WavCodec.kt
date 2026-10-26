@@ -1,4 +1,4 @@
-package com.okdrummer.app.assets
+package com.okdrumdrum.app.assets
 
 import java.io.File
 import java.nio.ByteBuffer

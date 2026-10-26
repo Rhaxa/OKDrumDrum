@@ -4,7 +4,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- 8 pads (2 rows × 4), one accented — the OKDrummer grid -->
+    <!-- 8 pads (2 rows × 4), one accented — the OKDrumDrum grid -->
     <path
         android:fillColor="#7EA6FF"
         android:pathData="M27,33 L33,33 A3,3 0 0 1 36,36 L36,44 A3,3 0 0 1 33,47 L27,47 A3,3 0 0 1 24,44 L24,36 A3,3 0 0 1 27,33 Z" />

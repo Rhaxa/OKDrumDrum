@@ -1,4 +1,4 @@
-package com.okdrummer.app
+package com.okdrumdrum.app
 
 import android.Manifest
 import android.content.Context
@@ -41,12 +41,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.okdrummer.app.assets.CustomStore
-import com.okdrummer.app.assets.PadSettings
-import com.okdrummer.app.assets.SampleBank
-import com.okdrummer.app.engine.DrumEngine
-import com.okdrummer.app.engine.MicRecorder
-import com.okdrummer.app.ui.PadSheet
+import com.okdrumdrum.app.assets.CustomStore
+import com.okdrumdrum.app.assets.PadSettings
+import com.okdrumdrum.app.assets.SampleBank
+import com.okdrumdrum.app.engine.DrumEngine
+import com.okdrumdrum.app.engine.MicRecorder
+import com.okdrumdrum.app.ui.PadSheet
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -270,7 +270,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        const val TAG = "OKDrummer"
+        const val TAG = "OKDrumDrum"
         const val COLUMNS = 4
     }
 }

@@ -1,8 +1,8 @@
-package com.okdrummer.app.assets
+package com.okdrumdrum.app.assets
 
 import android.content.Context
 import android.util.Log
-import com.okdrummer.app.Pad
+import com.okdrumdrum.app.Pad
 import java.io.File
 
 /** Owns the per-pad custom sounds in filesDir/custom/ (PROJECT.md §2). */
@@ -37,6 +37,6 @@ class CustomStore(context: Context) {
     private fun file(pad: Pad) = File(dir, "${pad.asset}.wav")
 
     private companion object {
-        const val TAG = "OKDrummer"
+        const val TAG = "OKDrumDrum"
     }
 }

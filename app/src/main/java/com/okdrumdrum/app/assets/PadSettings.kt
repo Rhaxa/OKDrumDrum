@@ -1,7 +1,7 @@
-package com.okdrummer.app.assets
+package com.okdrumdrum.app.assets
 
 import android.content.Context
-import com.okdrummer.app.Pad
+import com.okdrumdrum.app.Pad
 
 /** Persisted per-pad settings: volume (0..1) and the first-launch advisory flag. */
 class PadSettings(context: Context) {

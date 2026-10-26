@@ -18,9 +18,9 @@ A low-latency landscape Android drumpad, pure Kotlin + Compose, no third-party a
 
 ### v1.x roadmap (user-decided 2026-10-26)
 
-1. **Latency reduction** (Phase 7, nearly closed): the AAudio/C++ callback engine (raw AAudio via JNI, app/src/main/cpp) is at PLATFORM PARITY with reference drum apps on the user's OPPO — flinger reports an identical 52.67 ms track latency for our app and the best-known reference drum app (fast output AudioOut_1D, HAL 256, dirac inactive). App-side ≈2 ms. The loudspeaker constant is vendor HAL/DSP, not beatable per-app. User A/B feel verdict received: parity confirmed by ear (2026-10-26).
-2. **Sound banks A–B–C–D** — user swaps ALL 8 sounds of a bank to another set; each bank has a color that changes the pads' outline; Bank A = current blue. **BLOCKED**: waiting for the user to provide an interface mockup.
-3. **UI refresh of the pads** (with banks) — same **BLOCKED on the mockup**.
+1. **Latency (Phase 7, closed)**: the AAudio/C++ callback engine (raw AAudio via JNI, app/src/main/cpp) is at PLATFORM PARITY with reference drum apps on the user's OPPO — flinger reports an identical 52.67 ms track latency (fast output AudioOut_1D, HAL 256, dirac inactive). App-side ≈2 ms; the loudspeaker constant is vendor HAL/DSP. User A/B feel verdict: parity confirmed by ear (2026-10-26).
+2. **Phase 8 shipped in v1.2.0 (2026-10-26)**: banks A–D (independent sound sets; switch = straight tap on button groups on BOTH sides of the top bar; active bank shown ONLY by pad outline color + flash/dot/panel accent, buttons have constant look; ~160 ms cross-fade; per-bank customs/volumes/selection persist; defaults differ subtly per bank via tools/make_sounds.py BANKS dict; v1.1 data migrated into Bank A). Final visuals are the user's own SVGs applied in drawBehind (pad lip/hairline/dot-texture clipped to rounded outline, 64×64 button recipe, black pill, top bar painted black). Palette: A #1DA8E8, B #46D140, C #F7931E, D #F02FC2.
+3. Known UI pitfall: the `volumes` state map only recomposes on STRUCTURAL writes — mutating an inner plain map is invisible to Compose (this caused the v1.2.0 slider regression). Keep writes on the outer map.
 
 ## 2. Current architecture
 
@@ -78,10 +78,8 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 
 ## 4. Immediate next steps
 
-1. **Update `PROJECT.md` Phase 7 as findings land** (docs-before-diff). If measurements point to an engine replacement (e.g. AAudio/Oboe), the "no NDK / Kotlin only" rule in §1/§2 must be amended BEFORE coding (Oboe = prebuilt `.so`/AAR, a deliberate rule change).
-2. Investigate the ~20 ms: re-verify on device with `adb logcat | grep OKDrumDrum` (hook still live); compare `appMs` vs `outputMs` split; candidate levers: buffer size (currently 2× fast-path buffer), primed-silence depth, chunk granularity, then decide AudioTrack tuning vs engine rewrite (AAFaudio/Oboe = candidates only; decided during Phase 7).
-3. Acceptance for phase: steady-state ≤ 33 ms target on the reference device (user said latency sat "constantly 20 ms above target" — treat 47 ms as the baseline to beat).
-4. Do NOT start banks/mockup work — blocked until user supplies the interface mockup.
+1. Phase 8 is closed (v1.2.0 tagged and pushed). Next backlog items exist only in outline — follow the docs-first rule: write the new feature into PROJECT.md §1/§2 BEFORE implementing anything.
+2. Candidates the user may raise next: launcher icon from their own assets, snappier in-app feel, recordings polish, or a new feature set (drum patterns/looping, kits export). Ask the user; do not start speculative work.
 
 ## 5. Strict rules (must follow)
 
@@ -97,8 +95,8 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 - Builds: `JAVAHOME…` (next line) — CLI builds MUST set:
   `JAVA_HOME="/Users/aaghilone/Library/Java/JavaVirtualMachines/jbr-17.0.14/Contents/Home"` — system Java 26 breaks Gradle 8.9. Android Studio unaffected.
   Command: `JAVA_HOME="<jbr-17>" ./gradlew :app:assembleDebug :app:lintDebug`
-- Pins: Gradle 8.9 · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · SDK 34 (only android-29/34 platforms installed locally) · minSdk 26 · versionCode 3 / versionName 1.0.0.
+- Pins: Gradle 8.9 · AGP 8.7.3 · Kotlin 2.0.21 · Compose BOM 2024.09.03 · SDK 34 (only android-29/34 platforms installed locally) · minSdk 29 (API-29+ AAudio data callbacks) · versionCode 6 / versionName 1.2.0.
 - Device: OPPO DN2103 (`FQ4LLZUWEYXG4XLF`); adb at `$HOME/Library/Android/sdk/platform-tools/adb`; deploy = `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
 - First diagnostic after any crash: `adb logcat -d -b crash "*:E"`; latency check: `adb logcat | grep OKDrumDrum` (log tag is **OKDrumDrum** everywhere as of v1.0.1).
 - `gh` CLI is NOT usable on this machine (auth login fails; brew install hung) — publish via SSH push only (`git push -u origin main --follow-tags`).
-- Current APK (in-repo, committed): `dist/OKDrumDrum-1.1.0-debug.apk` (v1.1.0); README states the path explicitly.
+- Current APK (in-repo, committed): `dist/OKDrumDrum-1.2.0-debug.apk` (v1.2.0); README states the path explicitly.

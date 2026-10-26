@@ -94,4 +94,4 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 - Device: OPPO DN2103 (`FQ4LLZUWEYXG4XLF`); adb at `$HOME/Library/Android/sdk/platform-tools/adb`; deploy = `adb install -r app/build/outputs/apk/debug/app-debug.apk`.
 - First diagnostic after any crash: `adb logcat -d -b crash "*:E"`; latency check: `adb logcat | grep OKDrumDrum` (log tag is **OKDrumDrum** everywhere as of v1.0.1).
 - `gh` CLI is NOT usable on this machine (auth login fails; brew install hung) — publish via SSH push only (`git push -u origin main --follow-tags`).
-- APK in `dist/OKDrumDrum-1.0.0-debug.apk`.
+- Current APK (in-repo, committed): `dist/OKDrumDrum-1.0.1-debug.apk` (v1.0.1); README states the path explicitly.

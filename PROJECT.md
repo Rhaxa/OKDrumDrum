@@ -44,9 +44,21 @@ Pads (left→right, top row first):
 - **Migration**: v1.1 custom sounds + volumes migrate into **Bank A** on first 1.2 launch (one-time, flagged in prefs); active bank defaults to A.
 
 ### Non-goals
-No sequencer, no samples library browsing UI, no sharing/export, no sound packs UI (custom packs later = pre-built asset swaps, no feature work).
+No sequencer, no samples library browsing UI, no sound packs UI (custom packs later = pre-built asset swaps, no feature work), no general sharing/export UI — the exception is session recording (Phase 10), which saves a session file to a user-chosen location.
 
 **SPEC AMENDMENT (2026-10-26, user-approved via measurement decision):** the audio client may be a C++ NDK layer using AAudio (raw JNI AAudio at first — no Oboe dependency). Scope: just the audio client; all mixing logic and app code stay pure Kotlin + Compose. Third-party app libraries (incl. Oboe as an AAR) are still not allowed.
+
+### Backlog — user-requested 2026-10-29 (spec'd here; implement as Phases 9–10, docs-first)
+
+**System bars (Phase 9)**
+- While the app is running, the Android system bar is hidden — right edge in landscape, bottom in portrait — so the pads get the full surface.
+- The user can still reveal it with the usual Android swipe (edge swipe); it then auto-hides again — Android's standard *transient bars* behavior, not a permanent lock.
+
+**Session recording (Phase 10)**
+- A **record button** (top bar; exact spot to lock): tap → session starts, button animation goes 'active'; the player then plays pads normally; tap again → session stops, animation returns to 'idle'.
+- The session is captured as **the audio that actually plays** (the mixed output the player just triggered) — not a mic capture, not a re-synthesis of pad events.
+- On stop, a prompt asks the user to **name** the generated recording and **where to save** it (system location picker; sensible default such as Music/OKDrumDrum).
+- Open items to lock before coding: max session length, output format (default assumption: 16-bit PCM WAV at native rate, consistent with the existing WavCodec), file naming, button placement, and how mid-session bank switches / volume changes behave (they are simply part of what plays).
 
 ## 2. Technical constraints & contracts
 
@@ -142,4 +154,18 @@ Design is locked from the user's mockup + discussion (§1 Banks; button look con
 - ✅ UI: top bar (A–D left & right, center pill), pad grid restyle (rounded, bank outline, bank pressed state, bank dot, tiny label, cross-fade animation), bank-themed record panel
 - ✅ Version 1.2.0; close-out per §4 (lint 0, docs, CHANGELOG)
 - ✅ Accept: switching banks changes pad outline color + all 8 sounds atomically (both sides tappable); per-bank custom + volume persist; defaults differ audibly-but-subtly between banks; migration preserves v1.1 data; no dead code.
+
+### Phase 9 — Hide system bars (user-requested 2026-10-29) ☐
+- ☐ `MainActivity`: hide both system bars while the app is active (right bar in landscape, bottom bar in portrait); reveal on the usual Android swipe, auto-hide again — transient bars (API 30+: `WindowInsetsControllerCompat.hide(systemBars())` + `BEHAVE_SHOW_TRANSIENT_BARS_BY_SWIPE`; API 29: legacy `SYSTEM_UI_FLAG_IMMERSIVE_STICKY`)
+- ☐ No layout shift when the bar hides/reveals: content lays out edge-to-edge, the bar overlays when shown; pad grid & top bar unaffected
+- ☐ Phone QA: bar stays hidden while playing, swipe reveals Android-style, re-hides; verify landscape AND portrait; bank switching & pad hits unaffected
+- ☐ Close-out per §4 (lint 0, docs, CHANGELOG)
+
+### Phase 10 — Session recording (user-requested 2026-10-29) ☐
+- ☐ Record button in the top bar: tap to arm (animation 'active'), tap again to stop (animation 'idle')
+- ☐ While armed, capture the **live mixed output** (what the player just played) — the session file is what was heard; no mic, no event re-synthesis
+- ☐ On stop: prompt for **name + save location** (SAF picker; default e.g. Music/OKDrumDrum)
+- ☐ Engine: bounded PCM ring filled by the AAudio callback, flushed to disk by a dedicated writer thread — zero allocation on the audio thread (§3); capture runs alongside normal playback, no extra latency
+- ☐ Open items to lock first: session length cap, output format, naming, button placement, mid-session bank/volume behavior
+- ☐ Close-out per §4 (lint 0, docs, CHANGELOG)
 </content>

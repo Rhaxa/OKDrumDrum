@@ -84,8 +84,11 @@ QA-fix history (why some code looks the way it does): `%f`/Int format crash on s
 
 ## 4. Immediate next steps
 
-1. Phase 8 is closed (v1.2.0 tagged and pushed). Next backlog items exist only in outline — follow the docs-first rule: write the new feature into PROJECT.md §1/§2 BEFORE implementing anything.
-2. Candidates the user may raise next: launcher icon from their own assets, snappier in-app feel, recordings polish, or a new feature set (drum patterns/looping, kits export). Ask the user; do not start speculative work.
+1. Two user-requested backlog items are spec'd in PROJECT.md §1 (Backlog) + §5 as **Phase 9 & Phase 10** (2026-10-29) — implement in order, docs-first:
+   - **Phase 9 — hide system bars**: right bar (landscape) / bottom bar (portrait) hidden while the app runs; swipe reveals Android-style, auto-hides again (transient bars: `WindowInsetsControllerCompat` + `BEHAVE_SHOW_TRANSIENT_BARS_BY_SWIPE`, API 30+; legacy sticky flag on API 29; no layout shift — content edge-to-edge).
+   - **Phase 10 — session recording**: record button (top bar) arms/stops a capture of the **live mixed output** the player just played (not mic, not re-synthesis); on stop, prompt for name + save location (SAF picker, default e.g. Music/OKDrumDrum). Open items to lock first: max length, format (assumed 16-bit PCM WAV native rate), naming, button placement, mid-session bank/volume behavior.
+   - Lock those open items with the user before writing Phase 10's code; Phase 9 has no open items.
+2. Other candidates the user may raise: launcher icon from their own assets, snappier in-app feel, or a bigger feature set (drum patterns/looping, kits export). Ask, do not start speculative work.
 
 ## 5. Strict rules (must follow)
 
